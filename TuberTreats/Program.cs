@@ -192,14 +192,14 @@ app.MapGet("/tuberorders/{id}", (int id) =>
             Id = customer.Id,
             Name = customer.Name,
             Address = customer.Address,
-            TuberOrders = new List<TuberOrder>()
+            TuberOrders = new List<TuberOrderDTO>()
         },
         TuberDriverId = order.TuberDriverId,
         Driver = new TuberDriverDTO
         {
             Id = driver.Id,
             Name = driver.Name,
-            TuberDeliveries = new List<TuberDelivery>()
+            TuberDeliveries = new List<TuberDeliveryDTO>()
         },
         DeliveredOnDate = order.DeliveredOnDate,
         ToppingNames = order.Toppings.Select(topping => topping.Name).ToList(),
@@ -232,14 +232,14 @@ app.MapPost("/tuberorders", (TuberOrder tuberOrder) =>
             Id = customer.Id,
             Name = customer.Name,
             Address = customer.Address,
-            TuberOrders = new List<TuberOrder>()
+            TuberOrders = new List<TuberOrderDTO>()
         },
         TuberDriverId = tuberOrder.TuberDriverId,
         Driver = new TuberDriverDTO
         {
             Id = tuberDrivers.First(d => d.Id == tuberOrder.TuberDriverId).Id,
             Name = tuberDrivers.First(d => d.Id == tuberOrder.TuberDriverId).Name,
-            TuberDeliveries = new List<TuberDelivery>()
+            TuberDeliveries = new List<TuberDeliveryDTO>()
         },
         Toppings = tuberOrder.Toppings.Select(t => new ToppingDTO
         {
@@ -288,14 +288,14 @@ app.MapPut("/tuberorders/{id}", (int id, TuberOrder updatedOrder) =>
             Id = customer.Id,
             Name = customer.Name,
             Address = customer.Address,
-            TuberOrders = new List<TuberOrder>()
+            TuberOrders = new List<TuberOrderDTO>()
         },
         TuberDriverId = existingOrder.TuberDriverId,
         Driver = new TuberDriverDTO
         {
             Id = driver.Id,
             Name = driver.Name,
-            TuberDeliveries = new List<TuberDelivery>()
+            TuberDeliveries = new List<TuberDeliveryDTO>()
         },
         DeliveredOnDate = existingOrder.DeliveredOnDate,
         ToppingNames = existingOrder.Toppings.Select(topping => topping.Name).ToList()
@@ -347,14 +347,14 @@ app.MapPost("/tuberorders/{id}/complete", (int id) =>
             Id = customer.Id,
             Name = customer.Name,
             Address = customer.Address,
-            TuberOrders = new List<TuberOrder>()
+            TuberOrders = new List<TuberOrderDTO>()
         },
         TuberDriverId = order.TuberDriverId,
         Driver = new TuberDriverDTO
         {
             Id = driver.Id,
             Name = driver.Name,
-            TuberDeliveries = new List<TuberDelivery>()
+            TuberDeliveries = new List<TuberDeliveryDTO>()
         },
         DeliveredOnDate = order.DeliveredOnDate,
         ToppingNames = order.Toppings.Select(topping => topping.Name).ToList(),
@@ -472,21 +472,25 @@ app.MapDelete("/tubertoppings/{orderId}/{toppingId}", (int orderId, int toppingI
 //GET ALL CUSTOMERS
 app.MapGet("/customers", () =>
 {
-    return customers.Select(c => new CustomerDTO
+    return customers.Select(c => new CustomerBriefDTO
     {
         Id = c.Id,
         Name = c.Name,
         Address = c.Address,
         TuberOrders = tuberOrders
             .Where(o => o.CustomerId == c.Id)
-            .Select(o => new TuberOrder
+            .Select(o => new TuberOrderBriefDTO
             {
                 Id = o.Id,
                 OrderPlacedOnDate = o.OrderPlacedOnDate,
                 CustomerId = o.CustomerId,
                 TuberDriverId = o.TuberDriverId,
                 DeliveredOnDate = o.DeliveredOnDate,
-                Toppings = o.Toppings.ToList()
+                Toppings = o.Toppings.Select(t => new ToppingDTO
+                {
+                    Id = t.Id,
+                    Name = t.Name
+                }).ToList()
             })
             .ToList()
     }).ToList();
@@ -498,21 +502,25 @@ app.MapGet("/customers/{id}", (int id) =>
 {
     var customer = customers.FirstOrDefault(c => c.Id == id);
 
-    var customerDTO = new CustomerDTO
+    var customerDTO = new CustomerBriefDTO
     {
         Id = customer.Id,
         Name = customer.Name,
         Address = customer.Address,
         TuberOrders = tuberOrders
             .Where(o => o.CustomerId == customer.Id)
-            .Select(o => new TuberOrder
+            .Select(o => new TuberOrderBriefDTO
             {
                 Id = o.Id,
                 OrderPlacedOnDate = o.OrderPlacedOnDate,
                 CustomerId = o.CustomerId,
                 TuberDriverId = o.TuberDriverId,
                 DeliveredOnDate = o.DeliveredOnDate,
-                Toppings = o.Toppings.ToList()
+                Toppings = o.Toppings.Select(t => new ToppingDTO
+                {
+                    Id = t.Id,
+                    Name = t.Name
+                }).ToList()
             })
             .ToList()
     };
@@ -535,7 +543,7 @@ app.MapPost("/customers", (Customer newCustomer) =>
         Id = newCustomer.Id,
         Name = newCustomer.Name,
         Address = newCustomer.Address,
-        TuberOrders = new List<TuberOrder>()
+        TuberOrders = new List<TuberOrderDTO>()
     };
 
     return Results.Created($"/customers/{newCustomer.Id}", customerDTO);
