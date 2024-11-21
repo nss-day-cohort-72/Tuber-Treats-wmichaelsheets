@@ -1,9 +1,7 @@
 namespace TuberTreats.Models.DTOs;
 
-public class TuberDriverDTO
+public class TuberDriverSummaryDTO
 {
     public int Id { get; set; }
     public string Name { get; set; }
-    public List<TuberDelivery> TuberDeliveries { get; set; }
-
 }

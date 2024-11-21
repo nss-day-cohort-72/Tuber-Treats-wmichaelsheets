@@ -6,5 +6,5 @@ public class CustomerDTO
     public string Name { get; set; }
     public string Address { get; set; }
     public List<TuberOrder> TuberOrders { get; set; }
-    public CustomerDTO Customer { get; set; }
+
 }
